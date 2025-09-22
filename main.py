@@ -42,3 +42,15 @@ DEPT_MULTIPLIER: Dict[str, float] = {
 EMAIL_DOMAINS: List[str] = [
     "gmail.com", "outlook.com", "yahoo.com", "icloud.com", "proton.me", "company.com"
 ]
+def ensure_dirs() -> None:
+    DATA_DIR.mkdir(parents=True, exist_ok=True)
+    CHARTS_DIR.mkdir(parents=True, exist_ok=True)
+
+def choose_weighted(options: List[str], weights: List[float]) -> str:
+    return random.choices(options, weights=weights, k=1)[0]
+
+def gen_salary(level: str, dept: str) -> int:
+    low, high = LEVEL_BASE_RANGES[level]
+    base = random.randint(low, high)
+    mult = DEPT_MULTIPLIER.get(dept, 1.0)
+    return int(base * mult)
