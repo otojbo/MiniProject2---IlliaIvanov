@@ -114,3 +114,48 @@ def apply_schema(df: pd.DataFrame) -> pd.DataFrame:
     df["department"] = pd.Categorical(df["department"], categories=DEPARTMENTS, ordered=True)
     df["position_level"] = pd.Categorical(df["position_level"], categories=LEVELS, ordered=True)
     return df
+
+def plot_salary_by_department(df: pd.DataFrame) -> Path:
+    avg = (
+        df.groupby("department", observed=True)["salary_usd"]
+        .mean()
+        .sort_values(ascending=False)
+        .round(0)
+    )
+    ax = avg.plot.bar(figsize=(9, 5))
+    ax.set_title("Average Salary by Department (USD)")
+    ax.set_xlabel("Department")
+    ax.set_ylabel("Average Salary")
+    ax.grid(True, axis="y", alpha=0.3)
+    plt.xticks(rotation=30, ha="right")
+    out = CHARTS_DIR / "salary_by_department.png"
+    plt.tight_layout()
+    plt.savefig(out, dpi=150)
+    plt.close()
+    return out
+
+def plot_department_popularity(df: pd.DataFrame) -> Path:
+    counts = df["department"].value_counts().reindex(DEPARTMENTS).fillna(0).astype(int)
+    ax = counts.plot.bar(figsize=(9, 5))
+    ax.set_title("Department Popularity (Count)")
+    ax.set_xlabel("Department")
+    ax.set_ylabel("Count")
+    ax.grid(True, axis="y", alpha=0.3)
+    plt.xticks(rotation=30, ha="right")
+    out = CHARTS_DIR / "department_popularity.png"
+    plt.tight_layout()
+    plt.savefig(out, dpi=150)
+    plt.close()
+    return out
+
+def plot_age_histogram(df: pd.DataFrame) -> Path:
+    ax = df["age"].dropna().plot.hist(bins=24, figsize=(9, 5))
+    ax.set_title("Age Distribution")
+    ax.set_xlabel("Age")
+    ax.set_ylabel("Count")
+    ax.grid(True, alpha=0.3)
+    out = CHARTS_DIR / "age_hist.png"
+    plt.tight_layout()
+    plt.savefig(out, dpi=150)
+    plt.close()
+    return out
