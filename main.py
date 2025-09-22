@@ -54,3 +54,47 @@ def gen_salary(level: str, dept: str) -> int:
     base = random.randint(low, high)
     mult = DEPT_MULTIPLIER.get(dept, 1.0)
     return int(base * mult)
+
+def generate_fake_dataset(n: int = 1200, seed: int = RANDOM_SEED) -> pd.DataFrame:
+    random.seed(seed)
+    Faker.seed(seed)
+    fake = Faker()
+
+    today = date.today()
+    rows: List[Dict[str, object]] = []
+
+    for i in range(1, n + 1):
+        full_name = fake.name()
+        level = choose_weighted(LEVELS, LEVEL_WEIGHTS)
+        dept = choose_weighted(DEPARTMENTS, DEPT_WEIGHTS)
+
+        birth_date = fake.date_of_birth(minimum_age=18, maximum_age=65)
+        age = today.year - birth_date.year - (
+            (today.month, today.day) < (birth_date.month, birth_date.day)
+        )
+
+        country = fake.country()
+        domain = random.choice(EMAIL_DOMAINS)
+        email_local = full_name.lower().replace(" ", ".").replace("'", "")
+        email = f"{email_local}@{domain}"
+
+        hire_date = fake.date_between(start_date="-10y", end_date="today")
+        salary_usd = gen_salary(level, dept)
+
+        rows.append(
+            {
+                "id": i,
+                "full_name": full_name,
+                "email": email,
+                "email_domain": domain,
+                "country": country,
+                "department": dept,
+                "position_level": level,
+                "salary_usd": salary_usd,
+                "birth_date": birth_date,
+                "age": age,
+                "hire_date": hire_date,
+            }
+        )
+
+    return pd.DataFrame(rows)
