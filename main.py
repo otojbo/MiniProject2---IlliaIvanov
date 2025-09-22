@@ -159,3 +159,22 @@ def plot_age_histogram(df: pd.DataFrame) -> Path:
     plt.savefig(out, dpi=150)
     plt.close()
     return out
+
+def main() -> None:
+    ensure_dirs()
+    df = generate_fake_dataset(n=1200, seed=RANDOM_SEED)
+    df = apply_schema(df)
+    df.to_csv(DATA_CSV, index=False)
+    print(f"dataset: {df.shape} -> {DATA_CSV.resolve()}")
+
+    paths = [
+        plot_salary_by_department(df),
+        plot_department_popularity(df),
+        plot_age_histogram(df),
+    ]
+    print("charts saved:")
+    for p in paths:
+        print(" -", p.resolve())
+
+if __name__ == "__main__":
+    main()
