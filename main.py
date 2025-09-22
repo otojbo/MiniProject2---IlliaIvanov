@@ -98,3 +98,19 @@ def generate_fake_dataset(n: int = 1200, seed: int = RANDOM_SEED) -> pd.DataFram
         )
 
     return pd.DataFrame(rows)
+
+def apply_schema(df: pd.DataFrame) -> pd.DataFrame:
+    for col in ["full_name", "email", "email_domain"]:
+        df[col] = df[col].astype("string")
+
+    for col in ["birth_date", "hire_date"]:
+        df[col] = pd.to_datetime(df[col], errors="coerce")
+
+    df["id"] = df["id"].astype("int64")
+    df["salary_usd"] = df["salary_usd"].astype("int64")
+    df["age"] = pd.to_numeric(df["age"], errors="coerce").astype("Int64")
+
+    df["country"] = df["country"].astype("category")
+    df["department"] = pd.Categorical(df["department"], categories=DEPARTMENTS, ordered=True)
+    df["position_level"] = pd.Categorical(df["position_level"], categories=LEVELS, ordered=True)
+    return df
